@@ -188,7 +188,7 @@ Actor/Rollout/Reference Policy
       dtype: bfloat16 # should align with FSDP
       gpu_memory_utilization: 0.5
       ignore_eos: False
-      enforce_eager: True
+      enforce_eager: False
       free_cache_engine: True
       load_format: dummy_dtensor
       tensor_model_parallel_size: 2
@@ -419,8 +419,8 @@ Reference model will be enabled when ``actor.use_kl_loss`` or/and ``algorithm.us
   for vllm v0.5.4 and v0.6.3, we need to disable the usage of CUDAGraph
   (set ``enforce_eager`` to True.)
 
-- ``actor_rollout_ref.rollout.enforce_eager``: Whether to use CUDAGraph
-  in vLLM generation. Default set to True to disable CUDAGraph.
+- ``actor_rollout_ref.rollout.enforce_eager``: Whether to disable CUDAGraph
+  in vLLM generation. Default is False for best performance.
 
 - ``actor_rollout_ref.rollout.load_format``: Which weight loader to use
   to load the actor model weights to the rollout model.
