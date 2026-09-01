@@ -193,7 +193,7 @@ Actor/Rollout/Reference Policy
       load_format: dummy_dtensor
       tensor_model_parallel_size: 2
       max_num_batched_tokens: 8192
-      max_num_seqs: 1024
+      max_num_seqs: 256
       log_prob_micro_batch_size: null # will be deprecated, use log_prob_micro_batch_size_per_gpu
       log_prob_micro_batch_size_per_gpu: 16
       log_prob_use_dynamic_bsz: ${actor_rollout_ref.actor.use_dynamic_bsz}
