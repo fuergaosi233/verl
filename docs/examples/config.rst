@@ -190,7 +190,7 @@ Actor/Rollout/Reference Policy
       ignore_eos: False
       enforce_eager: True
       free_cache_engine: True
-      load_format: dummy_dtensor
+      load_format: dummy
       tensor_model_parallel_size: 2
       max_num_batched_tokens: 8192
       max_num_seqs: 1024
@@ -423,26 +423,23 @@ Reference model will be enabled when ``actor.use_kl_loss`` or/and ``algorithm.us
   in vLLM generation. Default set to True to disable CUDAGraph.
 
 - ``actor_rollout_ref.rollout.load_format``: Which weight loader to use
-  to load the actor model weights to the rollout model.
+  to load the actor model weights to the rollout model. Default is
+  ``dummy``.
 
-  - ``auto``: Use Megatron weight loader.
-  - ``megatron``: Use Megatron weight loader. Deployed with Megatron
-    backend. The input model ``state_dict()`` is already partitioned
-    along TP dimension and already gathered along PP dimension. This
-    weight loader requires that the Rollout model and Actor model's
-    parameters shape and name should be identical.
-  - ``dtensor``: Default solution when using Huggingface weight loader.
-    Deployed with FSDP backend and the state_dict_type is
-    ``StateDictType.SHARDED_STATE_DICT``. Recommend to use this weight
-    loader
-  - ``hf``: Use Huggingface weight loader. Deployed with FSDP backend
-    and the state_dict_type is ``StateDictType.FULL_STATE_DICT``. This
-    solution doesn't need to rewrite the weight loader for each model
-    implemented in vLLM but it results in larger peak memory usage.
-  - ``dummy_hf``, ``dummy_megatron``, ``dummy_dtensor``: Random
-    initialization.
+  - ``dummy``: Random initialization. Typical for actor/rollout hybrid
+    engine training; real actor weights are synced into the rollout
+    engine after init.
+  - ``auto``: Let the inference engine auto-detect the checkpoint
+    format (usually safetensors, then PyTorch). Used by some non-actor
+    rollouts such as reward-model and distillation teacher.
+  - ``safetensors``: Load weights from safetensors. Use for huge models
+    (set ``use_shm=True``) and for LoRA so vLLM can load the base
+    model.
 
-.. note:: **NOTED**: In this config field, users only need to select from ``dummy_megatron``, ``dummy_dtensor``, ``dummy_hf`` for rollout initialization and our hybrid engine will select the corresponding weight loader (i.e., ``megatron``, ``dtensor``, ``hf``) during actor/rollout weight synchronization.
+.. note:: For actor/rollout initialization, set ``load_format`` to
+  ``dummy`` unless the engine should load a checkpoint from disk
+  (``auto`` or ``safetensors``). Actor/rollout weight synchronization
+  is handled separately by the hybrid engine.
 
 
 Megatron Optimizer and Optimizer Parameter Scheduler
